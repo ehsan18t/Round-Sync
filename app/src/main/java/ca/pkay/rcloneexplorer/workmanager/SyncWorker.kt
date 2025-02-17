@@ -156,12 +156,16 @@ class SyncWorker (private var mContext: Context, workerParams: WorkerParameters)
             mTitle = mTask.remotePath
         }
         if(arePreconditionsMet()) {
+            val taskFilter = if(mTask.filterId != null ) mDatabase.getFilter(mTask.filterId!!) else null;
+            val taskFilterList = taskFilter?.getFilters() ?: ArrayList()
             sRcloneProcess = mRclone.sync(
                 remoteItem,
                 mTask.localPath,
                 mTask.remotePath,
                 mTask.direction,
-                mTask.md5sum
+                mTask.md5sum,
+                taskFilterList,
+                mTask.deleteExcluded
             )
             handleSync(mTitle)
             sendUploadFinishedBroadcast(remoteItem.name, mTask.remotePath)
@@ -231,6 +235,7 @@ class SyncWorker (private var mContext: Context, workerParams: WorkerParameters)
         when (failureReason) {
             FAILURE_REASON.NO_FAILURE -> {
                 showSuccessNotification(notificationId)
+                followupTask(mTask.onSuccessFollowup)
                 return
             }
             FAILURE_REASON.CANCELLED -> {
@@ -254,6 +259,7 @@ class SyncWorker (private var mContext: Context, workerParams: WorkerParameters)
                 content = mContext.getString(R.string.operation_failed_unknown_rclone_error, mTitle)
             }
         }
+        followupTask(mTask.onFailFollowup)
         showFailNotification(notificationId, content)
         endNotificationAlreadyPosted = true
         finishWork()
@@ -428,4 +434,11 @@ class SyncWorker (private var mContext: Context, workerParams: WorkerParameters)
             }
         }
 
+    private fun followupTask(followUpTaskID: Long?) {
+        if (followUpTaskID == null || followUpTaskID == -1L) {
+            return
+        }
+        Thread.sleep(1000)
+        SyncManager(mContext).queue(followUpTaskID)
+    }
 }
