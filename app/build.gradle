@@ -5,10 +5,10 @@ apply plugin: 'kotlinx-serialization'
 android {
     signingConfigs {
         release {
-            keyAlias System.getenv('SIGNING_KEY_ALIAS') ?: 'fdroid'
-            keyPassword System.getenv('SIGNING_KEY_PASSWORD') ?: ''
+            keyAlias System.getenv('SIGNING_KEY_ALIAS') ?: 'debug'
+            keyPassword System.getenv('SIGNING_KEY_PASSWORD') ?: 'android'
             storeFile file(System.getenv('SIGNING_KEYSTORE_PATH') ?: '.config/android/roundsync.keystore')
-            storePassword System.getenv('SIGNING_KEYSTORE_PASSWORD') ?: ''
+            storePassword System.getenv('SIGNING_KEYSTORE_PASSWORD') ?: 'android'
         }
     }
     ndkVersion project.properties['de.felixnuesse.extract.ndkVersion']
