@@ -70,7 +70,7 @@ jobs:
       - name: Build release APK (with debug signing)
         run: ./gradlew assemble${{ env.BUILD_VARIANT }}Release
         env:
-          SIGNING_KEYSTORE_PATH: app/.config/android/roundsync.keystore
+          SIGNING_KEYSTORE_PATH: .config/android/roundsync.keystore
           SIGNING_KEYSTORE_PASSWORD: android
           SIGNING_KEY_ALIAS: debug
           SIGNING_KEY_PASSWORD: android
